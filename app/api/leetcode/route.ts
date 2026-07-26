@@ -6,6 +6,7 @@ import { queryLeetCode } from "@/lib/api";
  * Route: /api/leetcode?username=xxx                    → submissions list
  * Route: /api/leetcode?username=xxx&type=submissions   → submissions list (explicit)
  * Route: /api/leetcode?username=xxx&type=stats         → profile stats only
+ * Route: /api/leetcode?username=xxx&type=profile       → user profile (name, username, avatar)
  * Route: /api/leetcode?submissionId=xxx               → submission code details
  */
 export async function GET(request: NextRequest) {
@@ -115,6 +116,31 @@ export async function GET(request: NextRequest) {
       console.error("[API] stats error:", err);
       return NextResponse.json(
         { error: err.message || "Failed to fetch profile stats from LeetCode." },
+        { status: 500 }
+      );
+    }
+  }
+
+  // ── User profile (globalData) ─────────────────────────────────────────────
+  if (type === "profile") {
+    try {
+      const query = `
+        query globalData {
+          userStatus {
+            username
+            realName
+            avatar
+            isPremium
+            isSignedIn
+          }
+        }
+      `;
+      const result = await queryLeetCode(query, {}, username!);
+      return NextResponse.json(result);
+    } catch (err: unknown) {
+      console.error("[API] profile error:", err);
+      return NextResponse.json(
+        { error: err instanceof Error ? err.message : "Failed to fetch user profile from LeetCode." },
         { status: 500 }
       );
     }

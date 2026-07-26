@@ -1,15 +1,18 @@
 "use client";
 
 import { Suspense } from "react";
+import Image from "next/image";
 import { useQueryState } from "nuqs";
 import { Hero } from "@/components/hero";
 import { SubmissionsList } from "@/components/submissions-list";
+import { UserProfileBadge } from "@/components/user-profile-badge";
 
 function HomeContent() {
   const [searchedUsername, setSearchedUsername] = useQueryState("username");
 
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-zinc-50 dark:bg-zinc-955 text-zinc-900 dark:text-zinc-50 font-sans transition-colors duration-300">
+    <div className="min-h-screen flex flex-col justify-between bg-zinc-50 dark:bg-zinc-955 text-zinc-900 font-sans transition-colors duration-300">
+
       <main className="flex-1 flex flex-col justify-start w-full">
         {searchedUsername ? (
           <SubmissionsList
@@ -40,6 +43,7 @@ export default function Home() {
     </Suspense>
   );
 }
+
 
 
 

@@ -17,6 +17,9 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "Leetalysis - LeetCode Profile Analytics",
   description: "Get deep visual insights, topic-wise metrics, and detailed progression analysis of any LeetCode profile instantly.",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
