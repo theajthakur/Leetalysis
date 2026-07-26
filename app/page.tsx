@@ -1,12 +1,47 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useQueryState } from "nuqs";
-import { Users } from "lucide-react";
+import { Users, Star } from "lucide-react";
+import { GithubIcon } from "@dev.icons/react";
 import { Hero } from "@/components/hero";
 import { SubmissionsList } from "@/components/submissions-list";
 import { StudentsSidebar } from "@/components/students-sidebar";
 import { cn } from "@/lib/utils";
+
+/** Minimal pill-style GitHub button with star count */
+function GithubStarButton() {
+  const [stars, setStars] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch("https://api.github.com/repos/theajthakur/Leetalysis")
+      .then((res) => res.json())
+      .then((data) => {
+        if (typeof data.stargazers_count === "number") {
+          setStars(data.stargazers_count);
+        }
+      })
+      .catch(() => {
+        // Silently fail if offline or API rate-limited
+      });
+  }, []);
+
+  return (
+    <a
+      href="https://github.com/theajthakur/Leetalysis"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-700 hover:text-zinc-900 dark:hover:text-white transition-all duration-200 shadow-2xs group"
+    >
+      <GithubIcon className="h-3.5 w-3.5 text-zinc-800 dark:text-zinc-200" />
+      <span>Star on GitHub</span>
+      <span className="flex items-center gap-1 text-zinc-500 dark:text-zinc-400 pl-1.5 border-l border-zinc-200 dark:border-zinc-800 ml-0.5 font-medium">
+        <Star className="h-3 w-3 fill-amber-400 text-amber-400 group-hover:scale-110 transition-transform duration-200" />
+        <span>{stars !== null ? stars : "—"}</span>
+      </span>
+    </a>
+  );
+}
 
 /** Minimal pill-style toggle switch (no extra shadcn dep needed) */
 function SidebarToggle({
@@ -74,8 +109,12 @@ function HomeContent() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-zinc-50 dark:bg-zinc-955 text-zinc-900 dark:text-zinc-50 font-sans transition-colors duration-300">
-
+    <div
+      className={cn(
+        "flex flex-col bg-zinc-50 dark:bg-zinc-955 text-zinc-900 dark:text-zinc-50 font-sans transition-colors duration-300",
+        searchedUsername ? "min-h-screen" : "h-screen max-h-screen overflow-hidden justify-between"
+      )}
+    >
       {/* Sidebar */}
       <StudentsSidebar
         isOpen={sidebarOpen}
@@ -86,11 +125,17 @@ function HomeContent() {
       {/* Main area — shifts right on md+ when sidebar is open */}
       <div
         className={cn(
-          "flex flex-col flex-1 min-h-screen transition-all duration-300",
+          "flex flex-col flex-1 transition-all duration-300",
+          searchedUsername ? "min-h-screen" : "h-full overflow-hidden justify-between",
           sidebarOpen ? "md:pl-72" : ""
         )}
       >
-        <main className="flex-1 flex flex-col justify-start w-full">
+        <main
+          className={cn(
+            "flex-1 flex flex-col w-full",
+            searchedUsername ? "justify-start" : "justify-center items-center overflow-hidden"
+          )}
+        >
           {searchedUsername ? (
             <SubmissionsList
               username={searchedUsername}
@@ -130,8 +175,11 @@ function HomeContent() {
         </main>
 
         {/* Footer */}
-        <footer className="w-full text-center py-4 text-xs text-zinc-450 dark:text-zinc-600 border-t border-zinc-200/10 dark:border-zinc-800/35 bg-white/40 dark:bg-zinc-950/20 backdrop-blur-xs">
-          <span>© {new Date().getFullYear()} Leetalysis. All rights reserved.</span>
+        <footer className="shrink-0 w-full border-t border-zinc-200/50 dark:border-zinc-800/50 bg-white/40 dark:bg-zinc-955/40 backdrop-blur-xs py-3 text-xs text-zinc-500 dark:text-zinc-400">
+          <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2.5">
+            <span>© {new Date().getFullYear()} Leetalysis. All rights reserved.</span>
+            <GithubStarButton />
+          </div>
         </footer>
       </div>
     </div>
