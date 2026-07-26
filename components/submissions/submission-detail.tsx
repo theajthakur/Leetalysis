@@ -162,9 +162,8 @@ export function SubmissionDetail({
           <div className="absolute right-3 top-3 z-10">
             <CopyButton text={details.code} />
           </div>
-          {/* overflow-x-auto is intentional here — only the code block scrolls */}
-          <div className="overflow-x-auto rounded-xl border border-zinc-800/60">
-            <pre className="p-4 bg-zinc-950 text-zinc-100 font-mono text-xs max-h-80 leading-relaxed select-all min-w-0">
+          <div className="overflow-auto max-h-80 rounded-xl border border-zinc-800/60 bg-zinc-950">
+            <pre className="p-4 bg-zinc-950 text-zinc-100 font-mono text-xs leading-relaxed select-all w-max min-w-full">
               <code>{details.code}</code>
             </pre>
           </div>
