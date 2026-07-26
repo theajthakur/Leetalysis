@@ -2,7 +2,8 @@
 
 import React from "react";
 import { StatCard } from "@/components/stat-card";
-import { AlertCircle, Trophy, Zap, Activity, Sparkles } from "lucide-react";
+import { AlertCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface SolvedStats {
   easy: number;
@@ -15,39 +16,46 @@ interface StatsDashboardProps {
   stats: SolvedStats;
   isLoading: boolean;
   error: string;
+  isSidebarOpen?: boolean;
 }
 
-export function StatsDashboard({ stats, isLoading, error }: StatsDashboardProps) {
+export function StatsDashboard({
+  stats,
+  isLoading,
+  error,
+  isSidebarOpen = false,
+}: StatsDashboardProps) {
   return (
     <>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div
+        className={cn(
+          "grid gap-4 mb-8 transition-all duration-300",
+          isSidebarOpen ? "grid-cols-2 lg:grid-cols-4" : "grid-cols-2 md:grid-cols-4"
+        )}
+      >
         <StatCard
           title="Total Solved"
           value={stats.total}
           isLoading={isLoading}
           theme="neutral"
-          icon={<Trophy className="h-5 w-5" />}
         />
         <StatCard
           title="Easy Solved"
           value={stats.easy}
           isLoading={isLoading}
           theme="emerald"
-          icon={<Zap className="h-5 w-5" />}
         />
         <StatCard
           title="Medium Solved"
           value={stats.medium}
           isLoading={isLoading}
           theme="amber"
-          icon={<Activity className="h-5 w-5" />}
         />
         <StatCard
           title="Hard Solved"
           value={stats.hard}
           isLoading={isLoading}
           theme="rose"
-          icon={<Sparkles className="h-5 w-5" />}
         />
       </div>
 

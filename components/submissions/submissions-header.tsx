@@ -1,50 +1,40 @@
 "use client";
 
-import React, { useState } from "react";
-import Image from "next/image";
+import React, { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Search, RotateCw } from "lucide-react";
+import { ArrowLeft, Search, RotateCw, User, Award } from "lucide-react";
+import { findStudentByHandle } from "@/lib/local-students";
 
 interface SubmissionsHeaderProps {
   username: string;
-  realName: string;
-  avatar: string;
-  profileLoading: boolean;
   onBack: () => void;
   onRefresh: () => void;
   isLoading: boolean;
   filterQuery: string;
   onFilterChange: (value: string) => void;
   isFilterDisabled: boolean;
+  rollNumber?: string;
 }
 
 export function SubmissionsHeader({
   username,
-  realName,
-  avatar,
-  profileLoading,
   onBack,
   onRefresh,
   isLoading,
   filterQuery,
   onFilterChange,
   isFilterDisabled,
+  rollNumber: propRollNumber,
 }: SubmissionsHeaderProps) {
-  const [imgError, setImgError] = useState(false);
+  // Check if student exists in localStorage
+  const localStudent = useMemo(() => findStudentByHandle(username), [username]);
 
-  const displayName = realName || username;
-  const initials = displayName
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
+  const name = localStudent?.name;
+  const rollNumber = propRollNumber || localStudent?.rollNumber;
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-4 mb-8">
-
       {/* Back button + identity */}
       <div className="flex items-center gap-3.5">
         <Button
@@ -56,46 +46,28 @@ export function SubmissionsHeader({
           <ArrowLeft className="h-5 w-5" />
         </Button>
 
-        {/* Avatar + name block */}
-        {profileLoading ? (
-          // Skeleton while profile loads
-          <div className="flex items-center gap-3">
-            <Skeleton className="h-10 w-10 rounded-full bg-zinc-200 dark:bg-zinc-800 shrink-0" />
-            <div className="flex flex-col gap-1.5">
-              <Skeleton className="h-4 w-32 bg-zinc-200 dark:bg-zinc-800 rounded" />
-              <Skeleton className="h-3 w-20 bg-zinc-200 dark:bg-zinc-800 rounded" />
-            </div>
+        {/* Identity block */}
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-500 flex items-center justify-center shrink-0">
+            {name ? <User className="h-5 w-5" /> : <Award className="h-5 w-5" />}
           </div>
-        ) : (
-          <div className="flex items-center gap-3">
-            {/* Avatar */}
-            <div className="h-10 w-10 rounded-full shrink-0 overflow-hidden ring-2 ring-orange-400/30 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-sm font-bold text-zinc-500 dark:text-zinc-400">
-              {!imgError && avatar ? (
-                <Image
-                  src={avatar}
-                  alt={displayName}
-                  width={40}
-                  height={40}
-                  className="object-cover w-full h-full"
-                  onError={() => setImgError(true)}
-                  unoptimized
-                />
-              ) : (
-                <span>{initials}</span>
+
+          <div className="flex flex-col leading-tight">
+            <h2 className="text-base font-bold font-heading text-zinc-900 dark:text-zinc-50 leading-snug">
+              {name || `@${username}`}
+            </h2>
+            <div className="flex items-center gap-2 mt-0.5">
+              <span className="text-xs text-zinc-400 dark:text-zinc-500">
+                {name ? `@${username}` : "Live LeetCode profile analytics feed"}
+              </span>
+              {rollNumber && (
+                <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded-md bg-orange-100 dark:bg-orange-500/15 text-orange-600 dark:text-orange-400 border border-orange-200/60 dark:border-orange-500/20">
+                  {rollNumber}
+                </span>
               )}
             </div>
-
-            {/* Name + username */}
-            <div className="flex flex-col leading-tight">
-              <h2 className="text-base font-bold font-heading text-zinc-900 dark:text-zinc-50 leading-snug">
-                {displayName}
-              </h2>
-              <span className="text-xs text-zinc-400 dark:text-zinc-500">
-                @{username}
-              </span>
-            </div>
           </div>
-        )}
+        </div>
       </div>
 
       {/* Search bar & Refresh */}

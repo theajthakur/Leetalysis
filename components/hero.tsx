@@ -9,9 +9,10 @@ import { Search, Loader2, ArrowRight } from "lucide-react";
 
 interface HeroProps {
   onSearch: (username: string) => void;
+  sidebarToggle?: React.ReactNode;
 }
 
-export function Hero({ onSearch }: HeroProps) {
+export function Hero({ onSearch, sidebarToggle }: HeroProps) {
   const [username, setUsername] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -39,6 +40,12 @@ export function Hero({ onSearch }: HeroProps) {
   return (
     <div className="relative flex w-full flex-col items-center justify-center font-sans transition-colors duration-300 flex-grow py-12 md:py-24">
 
+      {/* Sidebar toggle — top-right corner of the hero */}
+      {sidebarToggle && (
+        <div className="absolute top-4 right-4 z-10">
+          {sidebarToggle}
+        </div>
+      )}
       {/* Main Hero Content */}
       <main className="flex flex-col items-center justify-center text-center max-w-xl mx-auto w-full z-10 px-4">
 

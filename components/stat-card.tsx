@@ -10,7 +10,6 @@ interface StatCardProps {
   title: string;
   value: number | string | null;
   isLoading: boolean;
-  icon?: React.ReactNode;
   theme?: StatCardTheme;
   className?: string;
 }
@@ -19,31 +18,33 @@ export function StatCard({
   title,
   value,
   isLoading,
-  icon,
   theme = "neutral",
   className,
 }: StatCardProps) {
-  // Theme definitions for borders, backgrounds, and texts
   const themeClasses = {
     neutral: {
       card: "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60",
-      iconContainer: "bg-zinc-100 dark:bg-zinc-800/60 text-zinc-600 dark:text-zinc-400",
       value: "text-zinc-900 dark:text-zinc-50",
+      circleContainer: "bg-zinc-100 dark:bg-zinc-800/50 border-zinc-200/60 dark:border-zinc-700/50",
+      circleDot: "bg-zinc-400 dark:bg-zinc-500",
     },
     emerald: {
-      card: "border-emerald-100/80 dark:border-emerald-950/30 bg-white dark:bg-zinc-900/60",
-      iconContainer: "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400",
+      card: "border-emerald-100 dark:border-emerald-950/40 bg-white dark:bg-zinc-900/60",
       value: "text-emerald-600 dark:text-emerald-400",
+      circleContainer: "bg-emerald-500/10 dark:bg-emerald-500/15 border-emerald-500/20",
+      circleDot: "bg-emerald-500",
     },
     amber: {
-      card: "border-amber-100/80 dark:border-amber-950/30 bg-white dark:bg-zinc-900/60",
-      iconContainer: "bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400",
+      card: "border-amber-100 dark:border-amber-950/40 bg-white dark:bg-zinc-900/60",
       value: "text-amber-600 dark:text-amber-400",
+      circleContainer: "bg-amber-500/10 dark:bg-amber-500/15 border-amber-500/20",
+      circleDot: "bg-amber-500",
     },
     rose: {
-      card: "border-rose-100/80 dark:border-rose-950/30 bg-white dark:bg-zinc-900/60",
-      iconContainer: "bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400",
+      card: "border-rose-100 dark:border-rose-950/40 bg-white dark:bg-zinc-900/60",
       value: "text-rose-600 dark:text-rose-400",
+      circleContainer: "bg-rose-500/10 dark:bg-rose-500/15 border-rose-500/20",
+      circleDot: "bg-rose-500",
     },
   };
 
@@ -52,16 +53,16 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "flex items-center justify-between p-4.5 rounded-2xl border shadow-sm transition-all duration-300 backdrop-blur-md",
+        "relative overflow-hidden flex items-center justify-between p-4.5 rounded-2xl border shadow-sm transition-all duration-300 backdrop-blur-md",
         activeTheme.card,
         className
       )}
     >
-      <div className="space-y-1.5 flex-1 min-w-0">
+      <div className="space-y-1.5 flex-1 min-w-0 z-10">
         <p className="text-xs font-medium text-zinc-400 dark:text-zinc-500 truncate uppercase tracking-wider">
           {title}
         </p>
-        
+
         {isLoading ? (
           <Skeleton className="h-7 w-16 bg-zinc-200 dark:bg-zinc-800" />
         ) : (
@@ -71,11 +72,15 @@ export function StatCard({
         )}
       </div>
 
-      {icon && (
-        <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl", activeTheme.iconContainer)}>
-          {icon}
-        </div>
-      )}
+      {/* Styled low-opacity circle accent portion */}
+      <div
+        className={cn(
+          "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition-transform duration-300 group-hover:scale-105",
+          activeTheme.circleContainer
+        )}
+      >
+        <div className={cn("h-2.5 w-2.5 rounded-full opacity-60", activeTheme.circleDot)} />
+      </div>
     </div>
   );
 }

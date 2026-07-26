@@ -14,14 +14,19 @@ export { formatTimestamp } from "@/lib/format-timestamp";
 interface SubmissionsListProps {
   username: string;
   onBack: () => void;
+  rollNumber?: string;
+  isSidebarOpen?: boolean;
 }
 
-export function SubmissionsList({ username, onBack }: SubmissionsListProps) {
+export function SubmissionsList({
+  username,
+  onBack,
+  rollNumber,
+  isSidebarOpen,
+}: SubmissionsListProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [solvedStats, setSolvedStats] = useState({ easy: 0, medium: 0, hard: 0, total: 0 });
-  const [profile, setProfile] = useState<{ realName: string; avatar: string } | null>(null);
-  const [profileLoading, setProfileLoading] = useState(true);
 
   const [submissionsLoading, setSubmissionsLoading] = useState(true);
   const [submissionsError, setSubmissionsError] = useState("");
@@ -38,15 +43,13 @@ export function SubmissionsList({ username, onBack }: SubmissionsListProps) {
   const fetchData = async () => {
     setSubmissionsLoading(true);
     setStatsLoading(true);
-    setProfileLoading(true);
     setSubmissionsError("");
     setStatsError("");
     setExpandedId(null);
 
-    const [subsRes, statsRes, profileRes] = await Promise.allSettled([
+    const [subsRes, statsRes] = await Promise.allSettled([
       fetch(`/api/leetcode?username=${encodeURIComponent(username)}&type=submissions`),
       fetch(`/api/leetcode?username=${encodeURIComponent(username)}&type=stats`),
-      fetch(`/api/leetcode?username=${encodeURIComponent(username)}&type=profile`),
     ]);
 
     // ── Handle submissions ────────────────────────────────────────────────
@@ -99,22 +102,6 @@ export function SubmissionsList({ username, onBack }: SubmissionsListProps) {
       setStatsError(err instanceof Error ? err.message : "Failed to load stats.");
     } finally {
       setStatsLoading(false);
-    }
-
-    // ── Handle profile ────────────────────────────────────────────────────
-    try {
-      if (profileRes.status === "rejected") throw new Error("Network error");
-      const res = profileRes.value;
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const result = await res.json();
-      const status = result?.data?.userStatus;
-      if (status) {
-        setProfile({ realName: status.realName || "", avatar: status.avatar || "" });
-      }
-    } catch {
-      // silently ignore — profile is decorative, not critical
-    } finally {
-      setProfileLoading(false);
     }
   };
 
@@ -173,9 +160,7 @@ export function SubmissionsList({ username, onBack }: SubmissionsListProps) {
 
         <SubmissionsHeader
           username={username}
-          realName={profile?.realName ?? ""}
-          avatar={profile?.avatar ?? ""}
-          profileLoading={profileLoading}
+          rollNumber={rollNumber}
           onBack={onBack}
           onRefresh={fetchData}
           isLoading={submissionsLoading || statsLoading}
@@ -188,6 +173,7 @@ export function SubmissionsList({ username, onBack }: SubmissionsListProps) {
           stats={solvedStats}
           isLoading={statsLoading}
           error={statsError}
+          isSidebarOpen={isSidebarOpen}
         />
 
         {submissionsError && !submissionsLoading ? (
